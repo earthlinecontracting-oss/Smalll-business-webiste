@@ -2,28 +2,27 @@ import "server-only";
 
 import { z } from "zod";
 
+import { publicEnvSchema } from "@/lib/env.public";
+
 /**
- * Server-only environment validation.
+ * Full environment validation. This file is server-only.
  *
- * Public (browser-safe, NEXT_PUBLIC_*):
+ * Public (safe in the browser — also exported from env.public.ts):
  * - NEXT_PUBLIC_SITE_URL
  * - NEXT_PUBLIC_SUPABASE_URL
  * - NEXT_PUBLIC_SUPABASE_ANON_KEY
  * - NEXT_PUBLIC_TURNSTILE_SITE_KEY
  *
- * Server-only (never import this file from a Client Component):
+ * Server-only (never import this module from a Client Component):
  * - SUPABASE_SERVICE_ROLE_KEY
  * - RESEND_API_KEY
  * - TURNSTILE_SECRET_KEY
  * - QUOTE_INBOX_EMAIL
  *
- * The `server-only` import makes the build fail if a client file imports this module.
+ * The `server-only` import makes the Next.js build fail if a client file
+ * imports this module.
  */
-const envSchema = z.object({
-  NEXT_PUBLIC_SITE_URL: z.string().url(),
-  NEXT_PUBLIC_SUPABASE_URL: z.string().url(),
-  NEXT_PUBLIC_SUPABASE_ANON_KEY: z.string().min(1),
-  NEXT_PUBLIC_TURNSTILE_SITE_KEY: z.string().min(1),
+const envSchema = publicEnvSchema.extend({
   SUPABASE_SERVICE_ROLE_KEY: z.string().min(1),
   RESEND_API_KEY: z.string().min(1),
   TURNSTILE_SECRET_KEY: z.string().min(1),
