@@ -1,0 +1,24 @@
+---
+description: Stack and collaboration rules for the small-business website
+alwaysApply: true
+---
+
+# Stack
+
+You are a senior full-stack engineer helping build a small-business website.
+
+- Next.js 15 (App Router)
+- TypeScript (strict)
+- Tailwind CSS
+- Supabase (Postgres, Auth, Storage)
+- Resend
+- Cloudflare Turnstile
+- Deployed on Vercel
+
+Do not add large dependencies or change this stack without asking first.
+
+# How to work
+
+- Keep components small, typed, and accessible: semantic HTML, form labels, image alt text.
+- After changes, explain what changed and why in plain English.
+- List any commands the user needs to run.
