@@ -1,3 +1,14 @@
+/**
+ * TODO (Drive gallery — set up later, after the site is live):
+ * 1. Create a Google Cloud project and enable the Google Drive API.
+ * 2. Create a service account with no extra roles; download its JSON key.
+ * 3. Share ONE private Drive folder with the service account email as Viewer only.
+ * 4. Put photos in that folder (subfolders = categories; file description = caption/alt).
+ * 5. Set GOOGLE_SERVICE_ACCOUNT_JSON and GOOGLE_DRIVE_GALLERY_FOLDER_ID in .env.local
+ *    and in Vercel (server-only). Then run `npm run sync-gallery` or a production build.
+ * Until those env vars are set, this script exits without changing files. The site
+ * uses `public/gallery` and `src/config/gallery.ts`.
+ */
 import { createHash } from "node:crypto";
 import { readFileSync } from "node:fs";
 import { cp, mkdir, mkdtemp, readdir, rm, writeFile } from "node:fs/promises";
@@ -63,6 +74,14 @@ function loadDotEnvLocal() {
     if (process.env[key] === undefined) {
       process.env[key] = value;
     }
+  }
+}
+
+function skipIfUnconfigured(): void {
+  const json = process.env.GOOGLE_SERVICE_ACCOUNT_JSON?.trim() ?? "";
+  const folderId = process.env.GOOGLE_DRIVE_GALLERY_FOLDER_ID?.trim() ?? "";
+  if (!json || !folderId) {
+    process.exit(0);
   }
 }
 
@@ -181,12 +200,10 @@ async function collectFromFolder(
 }
 
 async function sync(): Promise<void> {
+  skipIfUnconfigured();
+
   const json = process.env.GOOGLE_SERVICE_ACCOUNT_JSON?.trim() ?? "";
   const folderId = process.env.GOOGLE_DRIVE_GALLERY_FOLDER_ID?.trim() ?? "";
-
-  if (!json || !folderId) {
-    keepLastGood("GOOGLE_SERVICE_ACCOUNT_JSON or GOOGLE_DRIVE_GALLERY_FOLDER_ID is not set.");
-  }
 
   let credentials: JWTInput;
   try {
