@@ -85,6 +85,12 @@ function skipIfUnconfigured(): void {
   }
 }
 
+// Only log the message: full Google API errors include request config
+// (folder IDs, auth headers) that must not reach build logs.
+function describeError(error: unknown): string {
+  return error instanceof Error ? error.message : String(error);
+}
+
 function keepLastGood(reason: string): never {
   console.warn(`[gallery] ${reason}`);
   console.warn("[gallery] Keeping the last good gallery. Build will continue.");
@@ -234,7 +240,7 @@ async function sync(): Promise<void> {
       try {
         original = await downloadFile(drive, file.id);
       } catch (error) {
-        console.warn(`[gallery] Could not download ${file.name}:`, error);
+        console.warn(`[gallery] Could not download ${file.name}: ${describeError(error)}`);
         continue;
       }
 
@@ -253,7 +259,7 @@ async function sync(): Promise<void> {
       try {
         webp = await processImage(original);
       } catch (error) {
-        console.warn(`[gallery] Could not convert ${file.name}:`, error);
+        console.warn(`[gallery] Could not convert ${file.name}: ${describeError(error)}`);
         continue;
       }
 
@@ -304,7 +310,7 @@ async function main() {
   try {
     await sync();
   } catch (error) {
-    console.warn("[gallery] Sync failed:", error);
+    console.warn(`[gallery] Sync failed: ${describeError(error)}`);
     keepLastGood("Drive sync threw an error.");
   }
 }
