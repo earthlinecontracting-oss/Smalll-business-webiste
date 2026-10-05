@@ -38,8 +38,7 @@ const parsed = envSchema.safeParse({
   NEXT_PUBLIC_SITE_URL: process.env.NEXT_PUBLIC_SITE_URL,
   NEXT_PUBLIC_TURNSTILE_SITE_KEY: process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY,
   RESEND_API_KEY: process.env.RESEND_API_KEY,
-  RESEND_FROM_EMAIL:
-    process.env.RESEND_FROM_EMAIL ?? "Earthline Contracting <onboarding@resend.dev>",
+  RESEND_FROM_EMAIL: process.env.RESEND_FROM_EMAIL,
   TURNSTILE_SECRET_KEY: process.env.TURNSTILE_SECRET_KEY,
   QUOTE_INBOX_EMAIL: process.env.QUOTE_INBOX_EMAIL,
   GOOGLE_SERVICE_ACCOUNT_JSON: process.env.GOOGLE_SERVICE_ACCOUNT_JSON ?? "",
