@@ -10,10 +10,11 @@ You are a senior full-stack engineer helping build a small-business website.
 - Next.js 15 (App Router)
 - TypeScript (strict)
 - Tailwind CSS
-- Supabase (Postgres, Auth, Storage)
 - Resend
 - Cloudflare Turnstile
 - Deployed on Vercel
+
+Testimonials live in `src/config/testimonials.ts`, not a database.
 
 Do not add large dependencies or change this stack without asking first.
 

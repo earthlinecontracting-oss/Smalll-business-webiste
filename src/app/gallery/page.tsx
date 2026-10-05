@@ -1,14 +1,28 @@
-import { Card } from "@/components/Card";
+import type { Metadata } from "next";
+
+import { GalleryGrid } from "@/components/GalleryGrid";
+import { PageCta } from "@/components/PageCta";
 import { Section } from "@/components/Section";
+import { gallery } from "@/config/gallery";
+import { site } from "@/config/site";
+
+export const metadata: Metadata = {
+  title: "Gallery",
+  description: `Project photos from ${site.name} earthworks jobs in ${site.serviceArea}.`,
+};
 
 export default function GalleryPage() {
   return (
-    <Section
-      id="gallery"
-      title="Gallery"
-      description="Placeholder gallery. Project photos will go here."
-    >
-      <Card title="Coming soon">No images yet.</Card>
-    </Section>
+    <>
+      <Section
+        id="gallery"
+        eyebrow="Our work"
+        title="Gallery"
+        description="Job-site photos. GPS and other metadata are stripped before anything is published."
+      >
+        <GalleryGrid items={gallery} />
+      </Section>
+      <PageCta />
+    </>
   );
 }

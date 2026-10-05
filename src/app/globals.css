@@ -1,19 +1,53 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* Sampled from the Earthline visiting card */
+  --earthline-cream: #f3ead8;
+  --earthline-ink: #1c1814;
+  --earthline-gold: #c4a35a;
+  --earthline-gold-dark: #9e8144;
+  --earthline-olive: #4f5d38;
+  --earthline-earth: #8a5a32;
+  --earthline-muted: #5c5348;
+  --earthline-card: #fffaf2;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-background: var(--earthline-cream);
+  --color-foreground: var(--earthline-ink);
+  --color-primary: var(--earthline-gold);
+  --color-primary-foreground: var(--earthline-ink);
+  --color-secondary: var(--earthline-ink);
+  --color-secondary-foreground: var(--earthline-cream);
+  --color-cream: var(--earthline-cream);
+  --color-ink: var(--earthline-ink);
+  --color-gold: var(--earthline-gold);
+  --color-gold-dark: var(--earthline-gold-dark);
+  --color-olive: var(--earthline-olive);
+  --color-earth: var(--earthline-earth);
+  --color-muted: var(--earthline-muted);
+  --color-card: var(--earthline-card);
+  --font-sans: var(--font-source-sans);
+  --font-display: var(--font-oswald);
+}
+
+html {
+  scroll-behavior: smooth;
+  overflow-x: clip;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: var(--font-geist-sans), system-ui, sans-serif;
+  background: var(--earthline-cream);
+  color: var(--earthline-ink);
+  font-family: var(--font-source-sans), system-ui, sans-serif;
+}
+
+:focus-visible {
+  outline: 2px solid var(--earthline-gold);
+  outline-offset: 3px;
+}
+
+::selection {
+  background: var(--earthline-gold);
+  color: var(--earthline-ink);
 }

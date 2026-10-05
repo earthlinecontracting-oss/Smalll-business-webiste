@@ -1,27 +1,32 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Oswald, Source_Sans_3 } from "next/font/google";
 
 import { Footer } from "@/components/Footer";
 import { Header } from "@/components/Header";
+import { StickyMobileCta } from "@/components/StickyMobileCta";
 import { site } from "@/config/site";
 import { env } from "@/lib/env";
 
 import "./globals.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const sourceSans = Source_Sans_3({
+  variable: "--font-source-sans",
   subsets: ["latin"],
+  weight: ["400", "600", "700"],
+  display: "swap",
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+const oswald = Oswald({
+  variable: "--font-oswald",
   subsets: ["latin"],
+  weight: ["500", "600", "700"],
+  display: "swap",
 });
 
 export const metadata: Metadata = {
   metadataBase: new URL(env.NEXT_PUBLIC_SITE_URL),
   title: {
-    default: site.name,
+    default: `${site.name} | Earthworks in Surrey, BC`,
     template: `%s | ${site.name}`,
   },
   description: site.tagline,
@@ -35,11 +40,20 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} flex min-h-screen flex-col bg-background font-sans text-foreground antialiased`}
+        className={`${sourceSans.variable} ${oswald.variable} flex min-h-screen flex-col bg-cream font-sans text-ink antialiased`}
       >
+        <a
+          href="#main"
+          className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-[60] focus:rounded-md focus:bg-gold focus:px-4 focus:py-2 focus:text-ink"
+        >
+          Skip to content
+        </a>
         <Header />
-        <main className="mx-auto w-full max-w-5xl flex-1 px-6">{children}</main>
+        <main id="main" className="flex-1 pb-[calc(5.5rem+env(safe-area-inset-bottom))] xl:pb-0">
+          {children}
+        </main>
         <Footer />
+        <StickyMobileCta />
       </body>
     </html>
   );

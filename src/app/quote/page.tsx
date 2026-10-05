@@ -1,14 +1,23 @@
-import { Card } from "@/components/Card";
+import type { Metadata } from "next";
+
+import { QuoteForm } from "@/components/QuoteForm";
 import { Section } from "@/components/Section";
+import { site } from "@/config/site";
+
+export const metadata: Metadata = {
+  title: "Get a Quote",
+  description: `Request a free earthworks estimate from ${site.name} in ${site.serviceArea}.`,
+};
 
 export default function QuotePage() {
   return (
     <Section
       id="quote"
+      eyebrow="Free estimate"
       title="Request a quote"
-      description="Placeholder quote page. The form will post through a Server Action and Zod."
+      description={`First name and email are enough to start, or call ${site.contactName} at ${site.phone}.`}
     >
-      <Card title="Coming soon">Quote form is not wired up yet.</Card>
+      <QuoteForm />
     </Section>
   );
 }

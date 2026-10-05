@@ -6,14 +6,8 @@ alwaysApply: true
 # Secrets
 
 - Never hard-code secrets. Read them from environment variables.
-- Never expose the Supabase service role key to the browser. Use it only in server code.
 
 # Validation and writes
 
 - Validate ALL user input on the server with Zod, even when the browser already validates it.
 - Use Server Actions or Route Handlers for anything that writes data. Do not write from client-only code.
-
-# Supabase
-
-- Enable Row Level Security on every table.
-- Write explicit policies for each table (who can select, insert, update, delete).

@@ -1,27 +1,29 @@
 import Link from "next/link";
 
-import { Button } from "@/components/Button";
-import { navItems, site } from "@/config/site";
+import { BrandMark } from "@/components/BrandMark";
+import { PrimaryNav } from "@/components/PrimaryNav";
+import { site } from "@/config/site";
 
 export function Header() {
   return (
-    <header className="border-b border-neutral-200 bg-white">
-      <div className="mx-auto flex max-w-5xl items-center justify-between gap-4 px-6 py-4">
-        <Link href="/" className="font-semibold text-neutral-900">
-          {site.name}
+    <header className="sticky top-0 z-50 border-b-2 border-gold bg-ink/95 text-cream backdrop-blur">
+      <div className="relative mx-auto flex w-full max-w-[90rem] items-center justify-between gap-4 px-4 py-3 sm:px-6 sm:py-4 lg:px-8">
+        <Link
+          href="/"
+          className="flex min-w-0 items-center gap-3 text-cream"
+          aria-label={`${site.name} home`}
+        >
+          <BrandMark className="h-10 w-10 shrink-0" />
+          <span className="min-w-0 leading-tight">
+            <span className="block font-display text-lg uppercase tracking-[0.14em] sm:text-xl">
+              {site.shortName}
+            </span>
+            <span className="block text-[0.65rem] font-semibold uppercase tracking-[0.28em] text-gold">
+              Contracting
+            </span>
+          </span>
         </Link>
-        <nav aria-label="Primary">
-          <ul className="flex flex-wrap items-center gap-4 text-sm">
-            {navItems.map((item) => (
-              <li key={item.href}>
-                <Link href={item.href} className="text-neutral-700 hover:text-neutral-900">
-                  {item.label}
-                </Link>
-              </li>
-            ))}
-          </ul>
-        </nav>
-        <Button href="/quote">Get a quote</Button>
+        <PrimaryNav />
       </div>
     </header>
   );

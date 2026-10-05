@@ -9,35 +9,41 @@ import { publicEnvSchema } from "@/lib/env.public";
  *
  * Public (safe in the browser — also exported from env.public.ts):
  * - NEXT_PUBLIC_SITE_URL
- * - NEXT_PUBLIC_SUPABASE_URL
- * - NEXT_PUBLIC_SUPABASE_ANON_KEY
  * - NEXT_PUBLIC_TURNSTILE_SITE_KEY
  *
  * Server-only (never import this module from a Client Component):
- * - SUPABASE_SERVICE_ROLE_KEY
  * - RESEND_API_KEY
+ * - RESEND_FROM_EMAIL
  * - TURNSTILE_SECRET_KEY
  * - QUOTE_INBOX_EMAIL
+ * - GOOGLE_SERVICE_ACCOUNT_JSON (Drive gallery sync; empty until configured)
+ * - GOOGLE_DRIVE_GALLERY_FOLDER_ID
  *
  * The `server-only` import makes the Next.js build fail if a client file
  * imports this module.
  */
 const envSchema = publicEnvSchema.extend({
-  SUPABASE_SERVICE_ROLE_KEY: z.string().min(1),
   RESEND_API_KEY: z.string().min(1),
+  RESEND_FROM_EMAIL: z
+    .string()
+    .min(5)
+    .refine((value) => /@/.test(value), "RESEND_FROM_EMAIL must include an @"),
   TURNSTILE_SECRET_KEY: z.string().min(1),
   QUOTE_INBOX_EMAIL: z.string().email(),
+  GOOGLE_SERVICE_ACCOUNT_JSON: z.string().default(""),
+  GOOGLE_DRIVE_GALLERY_FOLDER_ID: z.string().default(""),
 });
 
 const parsed = envSchema.safeParse({
   NEXT_PUBLIC_SITE_URL: process.env.NEXT_PUBLIC_SITE_URL,
-  NEXT_PUBLIC_SUPABASE_URL: process.env.NEXT_PUBLIC_SUPABASE_URL,
-  NEXT_PUBLIC_SUPABASE_ANON_KEY: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
   NEXT_PUBLIC_TURNSTILE_SITE_KEY: process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY,
-  SUPABASE_SERVICE_ROLE_KEY: process.env.SUPABASE_SERVICE_ROLE_KEY,
   RESEND_API_KEY: process.env.RESEND_API_KEY,
+  RESEND_FROM_EMAIL:
+    process.env.RESEND_FROM_EMAIL ?? "Earthline Contracting <onboarding@resend.dev>",
   TURNSTILE_SECRET_KEY: process.env.TURNSTILE_SECRET_KEY,
   QUOTE_INBOX_EMAIL: process.env.QUOTE_INBOX_EMAIL,
+  GOOGLE_SERVICE_ACCOUNT_JSON: process.env.GOOGLE_SERVICE_ACCOUNT_JSON ?? "",
+  GOOGLE_DRIVE_GALLERY_FOLDER_ID: process.env.GOOGLE_DRIVE_GALLERY_FOLDER_ID ?? "",
 });
 
 if (!parsed.success) {
