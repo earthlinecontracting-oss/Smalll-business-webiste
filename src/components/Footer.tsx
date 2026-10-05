@@ -61,6 +61,11 @@ export function Footer() {
                   {site.quoteLabel}
                 </Link>
               </li>
+              <li>
+                <Link href={site.privacyHref} className="text-cream/80 hover:text-gold">
+                  {site.privacyLabel}
+                </Link>
+              </li>
             </ul>
           </nav>
           <ul className="mt-6 flex flex-wrap gap-4 text-sm">
@@ -82,7 +87,10 @@ export function Footer() {
       </Container>
       <Container className="border-t border-gold/20 py-6">
         <p className="text-sm text-cream/70">
-          © {site.copyrightYear} {site.name}. All rights reserved.
+          © {site.copyrightYear} {site.name}. All rights reserved.{" "}
+          <Link href={site.privacyHref} className="text-gold hover:underline">
+            {site.privacyLabel}
+          </Link>
         </p>
       </Container>
     </footer>

@@ -4,12 +4,9 @@ import { GalleryGrid } from "@/components/GalleryGrid";
 import { PageCta } from "@/components/PageCta";
 import { Section } from "@/components/Section";
 import { gallery } from "@/config/gallery";
-import { site } from "@/config/site";
+import { pages } from "@/config/seo";
 
-export const metadata: Metadata = {
-  title: "Gallery",
-  description: `Project photos from ${site.name} earthworks jobs in ${site.serviceArea}.`,
-};
+export const metadata: Metadata = pages.gallery;
 
 export default function GalleryPage() {
   return (

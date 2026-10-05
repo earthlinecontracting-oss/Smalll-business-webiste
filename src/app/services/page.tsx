@@ -1,18 +1,20 @@
 import type { Metadata } from "next";
 
 import { Card } from "@/components/Card";
+import { JsonLd } from "@/components/JsonLd";
 import { PageCta } from "@/components/PageCta";
 import { Section } from "@/components/Section";
-import { audiences, services, site } from "@/config/site";
+import { pages } from "@/config/seo";
+import { services } from "@/config/services";
+import { audiences, site } from "@/config/site";
+import { servicesJsonLd } from "@/lib/jsonld";
 
-export const metadata: Metadata = {
-  title: "Services",
-  description: `Earthworks services from ${site.name} throughout ${site.serviceArea}.`,
-};
+export const metadata: Metadata = pages.services;
 
 export default function ServicesPage() {
   return (
     <>
+      <JsonLd data={servicesJsonLd()} />
       <Section
         id="services"
         eyebrow="Our services"

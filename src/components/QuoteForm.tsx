@@ -50,7 +50,7 @@ export function QuoteForm({ nonce }: { nonce?: string }) {
       id="quote-form"
       className="rounded-lg border border-ink/10 bg-card p-5 sm:p-6"
       noValidate
-      key={`${state.status}-${state.message}-${values.fullName}-${values.email}-${values.phone}-${values.service}-${values.location}-${values.details}`}
+      key={`${state.status}-${state.message}-${values.fullName}-${values.email}-${values.phone}-${values.service}-${values.location}-${values.details}-${values.consent}`}
     >
       {state.message ? (
         <p className="mb-4 rounded-md border border-earth/40 bg-cream px-3 py-2 text-sm text-earth" role="alert">
@@ -164,6 +164,35 @@ export function QuoteForm({ nonce }: { nonce?: string }) {
         async
         defer
       />
+
+      <div className="mt-6">
+        <label htmlFor="consent" className="flex gap-3 text-sm text-ink">
+          <input
+            id="consent"
+            name="consent"
+            type="checkbox"
+            value="on"
+            required
+            defaultChecked={values.consent === "on"}
+            className="mt-1 size-4 shrink-0 accent-gold"
+          />
+          <span>
+            I agree that {site.name} can use this information to reply to my quote request.{" "}
+            <span className="text-earth">*</span>
+          </span>
+        </label>
+        <p className="mt-2 pl-7 text-sm text-muted">
+          See our{" "}
+          <a
+            href={site.privacyHref}
+            className="font-semibold text-ink underline decoration-gold underline-offset-4"
+          >
+            Privacy Policy
+          </a>
+          .
+        </p>
+        <FieldError message={state.fieldErrors.consent} />
+      </div>
 
       <div className="mt-6 flex flex-col gap-3 sm:flex-row">
         <Button type="submit" disabled={pending}>

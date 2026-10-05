@@ -4,8 +4,11 @@ import { headers } from "next/headers";
 
 import { Footer } from "@/components/Footer";
 import { Header } from "@/components/Header";
+import { JsonLd } from "@/components/JsonLd";
 import { StickyMobileCta } from "@/components/StickyMobileCta";
+import { homeDescription, homeTitle, ogImage } from "@/config/seo";
 import { site } from "@/config/site";
+import { contractorJsonLd } from "@/lib/jsonld";
 import { publicEnv } from "@/lib/env.public";
 
 import "./globals.css";
@@ -29,10 +32,37 @@ const oswald = Oswald({
 export const metadata: Metadata = {
   metadataBase: new URL(publicEnv.NEXT_PUBLIC_SITE_URL),
   title: {
-    default: `${site.name} | Earthworks in Surrey, BC`,
+    default: homeTitle,
     template: `%s | ${site.name}`,
   },
-  description: site.tagline,
+  description: homeDescription,
+  applicationName: site.name,
+  alternates: {
+    canonical: "/",
+  },
+  openGraph: {
+    title: homeTitle,
+    description: homeDescription,
+    url: "/",
+    siteName: site.name,
+    locale: "en_CA",
+    type: "website",
+    images: [ogImage],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: homeTitle,
+    description: homeDescription,
+    images: [ogImage.url],
+  },
+  icons: {
+    icon: [
+      { url: "/icon.svg", type: "image/svg+xml" },
+      { url: "/icon-32.png", sizes: "32x32", type: "image/png" },
+      { url: "/icon-192.png", sizes: "192x192", type: "image/png" },
+    ],
+    apple: [{ url: "/apple-icon.png", sizes: "180x180" }],
+  },
 };
 
 export default async function RootLayout({
@@ -48,6 +78,7 @@ export default async function RootLayout({
       <body
         className={`${sourceSans.variable} ${oswald.variable} flex min-h-screen flex-col bg-cream font-sans text-ink antialiased`}
       >
+        <JsonLd data={contractorJsonLd()} />
         <a
           href="#main"
           className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-[60] focus:rounded-md focus:bg-gold focus:px-4 focus:py-2 focus:text-ink"

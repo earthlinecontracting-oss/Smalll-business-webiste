@@ -2,11 +2,17 @@ import type { Metadata } from "next";
 
 import { Button } from "@/components/Button";
 import { Section } from "@/components/Section";
+import { pageSeo } from "@/config/seo";
 import { site } from "@/config/site";
 
 export const metadata: Metadata = {
-  title: "Page not found",
-  description: `That page is not on the ${site.name} website.`,
+  ...pageSeo({
+    path: "/404",
+    title: "Page not found",
+    description:
+      "That page is not on the Earthline Contracting site. See excavation and site prep services in Surrey and the Lower Mainland, BC.",
+  }),
+  robots: { index: false, follow: true },
 };
 
 export default function NotFound() {

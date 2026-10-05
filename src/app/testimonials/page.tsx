@@ -3,13 +3,11 @@ import type { Metadata } from "next";
 import { PageCta } from "@/components/PageCta";
 import { Section } from "@/components/Section";
 import { TestimonialCard } from "@/components/TestimonialCard";
+import { pages } from "@/config/seo";
 import { site } from "@/config/site";
 import { testimonials } from "@/config/testimonials";
 
-export const metadata: Metadata = {
-  title: "Testimonials",
-  description: `What clients say about ${site.name} in ${site.serviceArea}.`,
-};
+export const metadata: Metadata = pages.testimonials;
 
 export default function TestimonialsPage() {
   return (

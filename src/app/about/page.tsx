@@ -4,11 +4,9 @@ import { Button } from "@/components/Button";
 import { Card } from "@/components/Card";
 import { Section } from "@/components/Section";
 import { site, sellingPoints, team } from "@/config/site";
+import { pages } from "@/config/seo";
 
-export const metadata: Metadata = {
-  title: "About",
-  description: `Our story, team, and service area at ${site.name} in ${site.serviceArea}.`,
-};
+export const metadata: Metadata = pages.about;
 
 export default function AboutPage() {
   return (

@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import { services } from "@/config/site";
+import { services } from "@/config/services";
 import { formString, stripHtml, stripHtmlPreserveNewlines } from "@/lib/sanitize";
 
 export const quoteServiceOptions = [
@@ -14,7 +14,8 @@ export type QuoteFieldName =
   | "phone"
   | "service"
   | "location"
-  | "details";
+  | "details"
+  | "consent";
 
 export type QuoteFormValues = Record<QuoteFieldName, string>;
 
@@ -67,6 +68,7 @@ export const quoteSchema = z.object({
     .string()
     .transform((value) => stripHtmlPreserveNewlines(value))
     .pipe(z.string().max(5000)),
+  consent: z.literal("on", { error: "Please agree so we can reply to your request." }),
 });
 
 export const turnstileTokenSchema = z
@@ -83,6 +85,7 @@ export const emptyQuoteValues: QuoteFormValues = {
   service: "",
   location: "",
   details: "",
+  consent: "",
 };
 
 export function quoteValuesFromFormData(formData: FormData): QuoteFormValues {
@@ -93,6 +96,7 @@ export function quoteValuesFromFormData(formData: FormData): QuoteFormValues {
     service: formString(formData, "service"),
     location: formString(formData, "location"),
     details: formString(formData, "details"),
+    consent: formString(formData, "consent") === "on" ? "on" : "",
   };
 }
 
@@ -103,6 +107,7 @@ export function sanitizedQuoteValues(values: QuoteFormValues): QuoteFormValues {
     phone: stripHtml(values.phone).slice(0, 40),
     location: stripHtml(values.location).slice(0, 200),
     details: stripHtmlPreserveNewlines(values.details).slice(0, 5000),
+    consent: values.consent === "on" ? "on" : "",
     service: (quoteServiceOptions as readonly string[]).includes(stripHtml(values.service))
       ? stripHtml(values.service)
       : "",

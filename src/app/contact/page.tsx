@@ -3,12 +3,10 @@ import type { Metadata } from "next";
 import { Button } from "@/components/Button";
 import { Card } from "@/components/Card";
 import { Section } from "@/components/Section";
+import { pages } from "@/config/seo";
 import { site } from "@/config/site";
 
-export const metadata: Metadata = {
-  title: "Contact",
-  description: `Call, email, or request a quote from ${site.name} in ${site.serviceArea}.`,
-};
+export const metadata: Metadata = pages.contact;
 
 export default function ContactPage() {
   return (

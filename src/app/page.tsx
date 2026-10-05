@@ -9,17 +9,13 @@ import { Section } from "@/components/Section";
 import { TestimonialCard } from "@/components/TestimonialCard";
 import { gallery } from "@/config/gallery";
 import { audiences, sellingPoints, site } from "@/config/site";
+import { pages } from "@/config/seo";
 import { testimonials } from "@/config/testimonials";
 
 const previewTestimonials = testimonials.slice(0, 3);
 const previewGallery = gallery.slice(0, 6);
 
-export const metadata: Metadata = {
-  title: {
-    absolute: `${site.name} | Earthworks in Surrey, BC`,
-  },
-  description: site.tagline,
-};
+export const metadata: Metadata = pages.home;
 
 export default function HomePage() {
   return (

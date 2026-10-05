@@ -1,6 +1,7 @@
 "use server";
 
 import { sendEmail } from "@/lib/email";
+import { allowQuoteAttempt } from "@/lib/rate-limit";
 import { escapeHtml, formString } from "@/lib/sanitize";
 import { verifyTurnstileToken } from "@/lib/turnstile";
 import {
@@ -98,6 +99,16 @@ export async function submitQuote(
     return {
       status: "error",
       message: "Please complete the security check and try again.",
+      fieldErrors: {},
+      values: parsed.data,
+    };
+  }
+
+  const allowed = await allowQuoteAttempt();
+  if (!allowed) {
+    return {
+      status: "error",
+      message: `Too many quote requests. Please wait a bit, or call ${site.phone}.`,
       fieldErrors: {},
       values: parsed.data,
     };

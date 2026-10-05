@@ -3,12 +3,10 @@ import { headers } from "next/headers";
 
 import { QuoteForm } from "@/components/QuoteForm";
 import { Section } from "@/components/Section";
+import { pages } from "@/config/seo";
 import { site } from "@/config/site";
 
-export const metadata: Metadata = {
-  title: "Get a Quote",
-  description: `Request a free earthworks estimate from ${site.name} in ${site.serviceArea}.`,
-};
+export const metadata: Metadata = pages.quote;
 
 export default async function QuotePage() {
   const nonce = (await headers()).get("x-nonce") ?? undefined;
