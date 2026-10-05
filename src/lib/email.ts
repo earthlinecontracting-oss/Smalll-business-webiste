@@ -9,16 +9,14 @@ import { env } from "@/lib/env";
 export async function sendEmail(input: {
   subject: string;
   text: string;
+  html: string;
   replyTo?: string;
 }): Promise<void> {
   const key = env.RESEND_API_KEY;
   const placeholder = key.includes("your-resend") || key.length < 8;
 
   if (placeholder) {
-    console.info("Quote email skipped (Resend is not configured yet).", {
-      subject: input.subject,
-      to: env.QUOTE_INBOX_EMAIL,
-    });
+    console.info("Quote email skipped (Resend is not configured yet).");
     return;
   }
 
@@ -33,13 +31,13 @@ export async function sendEmail(input: {
       to: env.QUOTE_INBOX_EMAIL,
       subject: input.subject,
       text: input.text,
+      html: input.html,
       reply_to: input.replyTo,
     }),
   });
 
   if (!response.ok) {
-    const details = await response.text();
-    console.error("Resend rejected the quote email.", response.status, details);
+    console.error("Resend rejected the quote email.", response.status);
     throw new Error("The quote email could not be sent.");
   }
 }

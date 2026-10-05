@@ -1,13 +1,16 @@
 import type { Metadata } from "next";
 import { Oswald, Source_Sans_3 } from "next/font/google";
+import { headers } from "next/headers";
 
 import { Footer } from "@/components/Footer";
 import { Header } from "@/components/Header";
 import { StickyMobileCta } from "@/components/StickyMobileCta";
 import { site } from "@/config/site";
-import { env } from "@/lib/env";
+import { publicEnv } from "@/lib/env.public";
 
 import "./globals.css";
+
+export const dynamic = "force-dynamic";
 
 const sourceSans = Source_Sans_3({
   variable: "--font-source-sans",
@@ -24,7 +27,7 @@ const oswald = Oswald({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL(env.NEXT_PUBLIC_SITE_URL),
+  metadataBase: new URL(publicEnv.NEXT_PUBLIC_SITE_URL),
   title: {
     default: `${site.name} | Earthworks in Surrey, BC`,
     template: `%s | ${site.name}`,
@@ -32,11 +35,14 @@ export const metadata: Metadata = {
   description: site.tagline,
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  // Force a request so Next.js can copy the middleware CSP nonce onto its scripts.
+  await headers();
+
   return (
     <html lang="en">
       <body

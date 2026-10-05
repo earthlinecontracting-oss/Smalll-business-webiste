@@ -1,9 +1,13 @@
 "use server";
 
 import { sendEmail } from "@/lib/email";
+import { escapeHtml, formString } from "@/lib/sanitize";
+import { verifyTurnstileToken } from "@/lib/turnstile";
 import {
   quoteSchema,
   quoteValuesFromFormData,
+  sanitizedQuoteValues,
+  turnstileTokenSchema,
   type QuoteFieldName,
   type QuoteFormValues,
 } from "@/lib/validation/quote";
@@ -20,12 +24,51 @@ function blankOr(value: string, fallback = "Not provided") {
   return value.trim() ? value.trim() : fallback;
 }
 
+function quoteEmailBodies(input: {
+  fullName: string;
+  email: string;
+  phone: string;
+  service: string;
+  location: string;
+  details: string;
+}): { text: string; html: string } {
+  const lines = [
+    ["Name", input.fullName],
+    ["Email", input.email],
+    ["Phone", blankOr(input.phone)],
+    ["Service", blankOr(input.service)],
+    ["Location", blankOr(input.location)],
+  ] as const;
+
+  const details = blankOr(input.details, "No extra details.");
+
+  const text = [
+    `New quote request for ${site.name}`,
+    ...lines.map(([label, value]) => `${label}: ${value}`),
+    "",
+    details,
+  ].join("\n");
+
+  const html = [
+    `<p>New quote request for ${escapeHtml(site.name)}</p>`,
+    "<ul>",
+    ...lines.map(
+      ([label, value]) => `<li><strong>${escapeHtml(label)}:</strong> ${escapeHtml(value)}</li>`,
+    ),
+    "</ul>",
+    `<p>${escapeHtml(details).replace(/\n/g, "<br />")}</p>`,
+  ].join("");
+
+  return { text, html };
+}
+
 export async function submitQuote(
-  previous: QuoteFormState,
+  _previous: QuoteFormState,
   formData: FormData,
 ): Promise<QuoteFormState> {
-  const values = quoteValuesFromFormData(formData);
-  const parsed = quoteSchema.safeParse(values);
+  const rawValues = quoteValuesFromFormData(formData);
+  const values = sanitizedQuoteValues(rawValues);
+  const parsed = quoteSchema.safeParse(rawValues);
 
   if (!parsed.success) {
     const fieldErrors: QuoteFormState["fieldErrors"] = {};
@@ -45,29 +88,39 @@ export async function submitQuote(
   }
 
   const { fullName, email, phone, service, location, details } = parsed.data;
+  const turnstileParsed = turnstileTokenSchema.safeParse(
+    formString(formData, "cf-turnstile-response"),
+  );
+  const turnstileOk =
+    turnstileParsed.success && (await verifyTurnstileToken(turnstileParsed.data));
+
+  if (!turnstileOk) {
+    return {
+      status: "error",
+      message: "Please complete the security check and try again.",
+      fieldErrors: {},
+      values: parsed.data,
+    };
+  }
 
   try {
+    const body = quoteEmailBodies({ fullName, email, phone, service, location, details });
     await sendEmail({
       subject: `New quote request${service ? `: ${service}` : ""}`,
       replyTo: email,
-      text: [
-        `New quote request for ${site.name}`,
-        `Name: ${fullName}`,
-        `Email: ${email}`,
-        `Phone: ${blankOr(phone)}`,
-        `Service: ${blankOr(service)}`,
-        `Location: ${blankOr(location)}`,
-        "",
-        blankOr(details, "No extra details."),
-      ].join("\n"),
+      text: body.text,
+      html: body.html,
     });
   } catch (error) {
-    console.error("Quote form email failed.", error);
+    console.error("Quote form email failed.");
+    if (error instanceof Error) {
+      console.error(error.message);
+    }
     return {
       status: "error",
       message: `We could not send the form. Please call ${site.phone}.`,
       fieldErrors: {},
-      values,
+      values: parsed.data,
     };
   }
 
@@ -75,6 +128,6 @@ export async function submitQuote(
     status: "success",
     message: `Thanks, ${fullName}. We will get back to you. For a faster reply, call ${site.phone}.`,
     fieldErrors: {},
-    values: previous.values,
+    values: parsed.data,
   };
 }

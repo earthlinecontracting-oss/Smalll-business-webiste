@@ -1,12 +1,14 @@
 "use client";
 
 import { useActionState } from "react";
+import Script from "next/script";
 
 import { Button } from "@/components/Button";
 import { submitQuote, type QuoteFormState } from "@/app/quote/actions";
 import { emptyQuoteValues, quoteServiceOptions } from "@/lib/validation/quote";
 import { site } from "@/config/site";
 import { cn } from "@/lib/cn";
+import { publicEnv } from "@/lib/env.public";
 
 const initialQuoteState: QuoteFormState = {
   status: "idle",
@@ -18,7 +20,7 @@ const initialQuoteState: QuoteFormState = {
 const fieldClass =
   "mt-1 w-full rounded-md border border-ink/15 bg-cream px-3 py-2.5 text-ink placeholder:text-muted/70 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gold";
 
-export function QuoteForm() {
+export function QuoteForm({ nonce }: { nonce?: string }) {
   const [state, action, pending] = useActionState(submitQuote, initialQuoteState);
   const values = state.values;
 
@@ -143,6 +145,25 @@ export function QuoteForm() {
           <FieldError message={state.fieldErrors.details} />
         </div>
       </div>
+
+      <div className="mt-6">
+        <p className="sr-only" id="turnstile-label">
+          Security check
+        </p>
+        <div
+          className="cf-turnstile"
+          data-sitekey={publicEnv.NEXT_PUBLIC_TURNSTILE_SITE_KEY}
+          data-theme="light"
+          aria-labelledby="turnstile-label"
+        />
+      </div>
+      <Script
+        src="https://challenges.cloudflare.com/turnstile/v0/api.js"
+        strategy="afterInteractive"
+        nonce={nonce}
+        async
+        defer
+      />
 
       <div className="mt-6 flex flex-col gap-3 sm:flex-row">
         <Button type="submit" disabled={pending}>
