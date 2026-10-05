@@ -1,0 +1,5 @@
+# Public identifiers (from-address, inbox, site URL, Turnstile site key) are
+# inlined into the Next.js server bundle at build time. They are not credentials.
+# API keys and Turnstile secret stay fully scanned.
+[build.environment]
+  SECRETS_SCAN_OMIT_KEYS = "RESEND_FROM_EMAIL,QUOTE_INBOX_EMAIL,NEXT_PUBLIC_SITE_URL,NEXT_PUBLIC_TURNSTILE_SITE_KEY"
