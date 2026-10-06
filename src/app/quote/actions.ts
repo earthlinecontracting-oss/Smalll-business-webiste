@@ -82,7 +82,7 @@ export async function submitQuote(
 
     return {
       status: "error",
-      message: "Please fix the highlighted fields.",
+      message: "Please fix the items below, then send again.",
       fieldErrors,
       values,
     };
@@ -98,7 +98,7 @@ export async function submitQuote(
   if (!turnstileOk) {
     return {
       status: "error",
-      message: "Please complete the security check and try again.",
+      message: "Please complete the check below, then send again. You do not need to refresh the page.",
       fieldErrors: {},
       values: parsed.data,
     };

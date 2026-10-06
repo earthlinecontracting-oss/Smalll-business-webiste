@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useEffect, useId, useRef } from "react";
 import Script from "next/script";
 
 import { Button } from "@/components/Button";
@@ -20,9 +20,22 @@ const initialQuoteState: QuoteFormState = {
 const fieldClass =
   "mt-1 w-full rounded-md border border-ink/15 bg-cream px-3 py-2.5 text-ink placeholder:text-muted/70 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gold";
 
+const errorFieldClass = "border-earth/60";
+
+declare global {
+  interface Window {
+    turnstile?: {
+      render: (element: HTMLElement, options: { sitekey: string; theme?: string }) => string;
+      reset: (widgetId?: string) => void;
+      remove: (widgetId?: string) => void;
+    };
+  }
+}
+
 export function QuoteForm({ nonce }: { nonce?: string }) {
   const [state, action, pending] = useActionState(submitQuote, initialQuoteState);
   const values = state.values;
+  const fieldErrors = Object.values(state.fieldErrors).filter(Boolean);
 
   if (state.status === "success") {
     return (
@@ -50,12 +63,21 @@ export function QuoteForm({ nonce }: { nonce?: string }) {
       id="quote-form"
       className="rounded-lg border border-ink/10 bg-card p-5 sm:p-6"
       noValidate
-      key={`${state.status}-${state.message}-${values.fullName}-${values.email}-${values.phone}-${values.service}-${values.location}-${values.details}-${values.consent}`}
     >
       {state.message ? (
-        <p className="mb-4 rounded-md border border-earth/40 bg-cream px-3 py-2 text-sm text-earth" role="alert">
-          {state.message}
-        </p>
+        <div
+          className="mb-4 rounded-md border border-earth/40 bg-cream px-3 py-2 text-sm text-earth"
+          role="alert"
+        >
+          <p>{state.message}</p>
+          {fieldErrors.length > 0 ? (
+            <ul className="mt-2 list-disc space-y-1 pl-5">
+              {fieldErrors.map((message) => (
+                <li key={message}>{message}</li>
+              ))}
+            </ul>
+          ) : null}
+        </div>
       ) : null}
 
       <p className="mb-4 text-sm text-muted">Only first name and email are required.</p>
@@ -71,7 +93,8 @@ export function QuoteForm({ nonce }: { nonce?: string }) {
             autoComplete="given-name"
             required
             defaultValue={values.fullName}
-            className={fieldClass}
+            aria-invalid={Boolean(state.fieldErrors.fullName)}
+            className={cn(fieldClass, state.fieldErrors.fullName && errorFieldClass)}
           />
           <FieldError message={state.fieldErrors.fullName} />
         </div>
@@ -86,7 +109,8 @@ export function QuoteForm({ nonce }: { nonce?: string }) {
             autoComplete="email"
             required
             defaultValue={values.email}
-            className={fieldClass}
+            aria-invalid={Boolean(state.fieldErrors.email)}
+            className={cn(fieldClass, state.fieldErrors.email && errorFieldClass)}
           />
           <FieldError message={state.fieldErrors.email} />
         </div>
@@ -102,7 +126,6 @@ export function QuoteForm({ nonce }: { nonce?: string }) {
             defaultValue={values.phone}
             className={fieldClass}
           />
-          <FieldError message={state.fieldErrors.phone} />
         </div>
         <div>
           <label htmlFor="service" className="text-sm font-semibold text-ink">
@@ -116,7 +139,6 @@ export function QuoteForm({ nonce }: { nonce?: string }) {
               </option>
             ))}
           </select>
-          <FieldError message={state.fieldErrors.service} />
         </div>
         <div className="sm:col-span-2">
           <label htmlFor="location" className="text-sm font-semibold text-ink">
@@ -129,7 +151,6 @@ export function QuoteForm({ nonce }: { nonce?: string }) {
             defaultValue={values.location}
             className={fieldClass}
           />
-          <FieldError message={state.fieldErrors.location} />
         </div>
         <div className="sm:col-span-2">
           <label htmlFor="details" className="text-sm font-semibold text-ink">
@@ -142,28 +163,10 @@ export function QuoteForm({ nonce }: { nonce?: string }) {
             defaultValue={values.details}
             className={cn(fieldClass, "resize-y")}
           />
-          <FieldError message={state.fieldErrors.details} />
         </div>
       </div>
 
-      <div className="mt-6">
-        <p className="sr-only" id="turnstile-label">
-          Security check
-        </p>
-        <div
-          className="cf-turnstile"
-          data-sitekey={publicEnv.NEXT_PUBLIC_TURNSTILE_SITE_KEY}
-          data-theme="light"
-          aria-labelledby="turnstile-label"
-        />
-      </div>
-      <Script
-        src="https://challenges.cloudflare.com/turnstile/v0/api.js"
-        strategy="afterInteractive"
-        nonce={nonce}
-        async
-        defer
-      />
+      <TurnstileField nonce={nonce} resetKey={state.status === "error" ? state.message : ""} />
 
       <div className="mt-6">
         <label htmlFor="consent" className="flex gap-3 text-sm text-ink">
@@ -204,6 +207,50 @@ export function QuoteForm({ nonce }: { nonce?: string }) {
         </Button>
       </div>
     </form>
+  );
+}
+
+function TurnstileField({ nonce, resetKey }: { nonce?: string; resetKey: string }) {
+  const widgetId = useId();
+  const containerRef = useRef<HTMLDivElement>(null);
+  const turnstileId = useRef<string | null>(null);
+
+  function mountWidget() {
+    if (!containerRef.current || !window.turnstile || turnstileId.current) {
+      return;
+    }
+
+    turnstileId.current = window.turnstile.render(containerRef.current, {
+      sitekey: publicEnv.NEXT_PUBLIC_TURNSTILE_SITE_KEY,
+      theme: "light",
+    });
+  }
+
+  useEffect(() => {
+    mountWidget();
+  }, []);
+
+  useEffect(() => {
+    if (!resetKey || !turnstileId.current || !window.turnstile) {
+      return;
+    }
+
+    window.turnstile.reset(turnstileId.current);
+  }, [resetKey]);
+
+  return (
+    <div className="mt-6">
+      <p className="sr-only" id={`${widgetId}-label`}>
+        Security check
+      </p>
+      <div ref={containerRef} aria-labelledby={`${widgetId}-label`} />
+      <Script
+        src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit"
+        strategy="afterInteractive"
+        nonce={nonce}
+        onLoad={mountWidget}
+      />
+    </div>
   );
 }
 

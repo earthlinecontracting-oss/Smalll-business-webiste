@@ -19,47 +19,34 @@ export type QuoteFieldName =
 
 export type QuoteFormValues = Record<QuoteFieldName, string>;
 
-const optionalService = z
-  .string()
-  .transform((value) => stripHtml(value))
-  .refine(
-    (value) => value === "" || (quoteServiceOptions as readonly string[]).includes(value),
-    "Select a service",
-  );
-
-function isValidOptionalPhone(value: string): boolean {
-  if (value === "") {
-    return true;
-  }
-
-  if (!/^[+()0-9.\-\s]+$/.test(value)) {
-    return false;
-  }
-
-  const digits = value.replace(/\D/g, "");
-  return digits.length >= 10 && digits.length <= 15;
+function looksLikeEmail(value: string): boolean {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
 }
 
-/** Server-side quote form schema. Use this in Server Actions even if the UI also validates. */
+/** Server-side quote form schema. Keep this light so real customers are not blocked. */
 export const quoteSchema = z.object({
   fullName: z
     .string()
     .transform((value) => stripHtml(value))
-    .pipe(z.string().min(1, "First name is required").max(120)),
+    .pipe(z.string().min(1, "Please enter your first name.").max(120)),
   email: z
     .string()
     .transform((value) => stripHtml(value).toLowerCase())
-    .pipe(z.string().email("Enter a valid email").max(254)),
-  phone: z
-    .string()
-    .transform((value) => stripHtml(value))
     .pipe(
       z
         .string()
-        .max(40)
-        .refine(isValidOptionalPhone, "Enter a valid phone number"),
+        .min(1, "Please enter your email.")
+        .max(254)
+        .refine(looksLikeEmail, "Please enter a valid email."),
     ),
-  service: optionalService,
+  phone: z
+    .string()
+    .transform((value) => stripHtml(value))
+    .pipe(z.string().max(40)),
+  service: z.string().transform((value) => {
+    const clean = stripHtml(value);
+    return (quoteServiceOptions as readonly string[]).includes(clean) ? clean : "";
+  }),
   location: z
     .string()
     .transform((value) => stripHtml(value))
@@ -68,7 +55,7 @@ export const quoteSchema = z.object({
     .string()
     .transform((value) => stripHtmlPreserveNewlines(value))
     .pipe(z.string().max(5000)),
-  consent: z.literal("on", { error: "Please agree so we can reply to your request." }),
+  consent: z.literal("on", { error: "Please tick the box so we can reply to you." }),
 });
 
 export const turnstileTokenSchema = z
